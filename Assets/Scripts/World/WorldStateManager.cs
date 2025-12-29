@@ -87,6 +87,7 @@ namespace World
         private void Init()
         {
             RoomTransition(currentRoom);
+            audioManager.ChangeAudio(currentWorldState);
             // ChangeWorldState(currentWorldState);
         }
         public void ChangeWorldState(EWorldState newWorldState)
