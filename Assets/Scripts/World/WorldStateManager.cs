@@ -30,6 +30,7 @@ namespace World
 
         public Action<EWorldState> OnWorldStateChange;
         public Action<Room> OnRoomTransition;
+        private Portal fromPortal;
 
         public static WorldStateManager Instance => _worldStateManager;
         public Room CurrentRoom => currentRoom;
@@ -48,7 +49,7 @@ namespace World
             Init();
             
             // TESTING: Remove this eventually
-            RoomTransition(testRoom1);
+            RoomTransition(testRoom1, 0);
 
         }
 
@@ -59,11 +60,11 @@ namespace World
             {
                 if (currentRoom == testRoom1)
                 {
-                    RoomTransition(testRoom2);
+                    RoomTransition(testRoom2, 0);
                 }
                 else
                 {
-                    RoomTransition(testRoom1);
+                    RoomTransition(testRoom1, 0);
                 }
             }
 
@@ -105,14 +106,14 @@ namespace World
             // TESTING: Move player to new spawn point
             if (portalIndex != -1)
             {
-                var portal = currentRoom.GetPortal(portalIndex);
-                if (portal.SpawnPoint == null)
+                fromPortal = currentRoom.GetPortal(portalIndex);
+                if (fromPortal.SpawnPoint == null)
                 {
                     Debug.LogError("Portal does not have a spawn point!");
                     return;
                 }
                 Debug.Log("Portaling player...");
-                player.transform.position = portal.SpawnPoint.position;
+                player.transform.position = fromPortal.SpawnPoint.position;
             }
             
             OnRoomTransition?.Invoke(currentRoom);
@@ -121,6 +122,7 @@ namespace World
         public void HandlePlayerDeath()
         {
             Debug.Log("Handling player death");
+            player.transform.position = fromPortal.SpawnPoint.position;
         }
     }
 }
