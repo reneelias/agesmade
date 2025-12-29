@@ -12,6 +12,8 @@ public class PlayerControls : MonoBehaviour
     [SerializeField] private float maxSprintSpeed = 8f;
     [SerializeField] private float jumpSpeed = 10f;
     [SerializeField] private float frictionRatio = .9f;
+    private bool firstDeceleration = true;
+    private float movingTime = 0;
     [Header("Ground Check")]
     [SerializeField] private float raycastOffsetX = .25f;
     [SerializeField] private float raycastOffsetY = .5f;
@@ -53,18 +55,56 @@ public class PlayerControls : MonoBehaviour
             inputVel.x -= movementSpeed;
         }
 
-        if (Input.GetKey(KeyCode.LeftShift))
+        if(inputVel.x != 0)
         {
-            SetPlayerState(PlayerState.Sprinting);
-            inputVel.x *= sprintSpeed/movementSpeed;
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                SetPlayerState(PlayerState.Sprinting);
+                inputVel.x *= sprintSpeed/movementSpeed;
+            }
+            else
+            {
+                SetPlayerState(PlayerState.Walking);
+            }
+
+            velocity.x = inputVel.x;
+        }
+        if(inputVel.magnitude > 0)
+        {
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                SetPlayerState(PlayerState.Sprinting);
+            }
+            else
+            {
+                SetPlayerState(PlayerState.Walking);
+            }
+            float moveDir = inputVel.x < 0 ? -1 : 1;
+            movingTime += Time.deltaTime;
+            if(velocity.x == 0  || inputVel.x / velocity.x > 0)
+            {
+                velocity.x = (Mathf.Log(movingTime/10) + Mathf.Epsilon) * movementSpeed * moveDir;
+                firstDeceleration = true;
+            }
+            else
+            {
+                if (firstDeceleration)
+                {
+                    movingTime = 0;
+                    firstDeceleration = false;
+                }
+                
+                velocity.x += Mathf.Exp(movingTime) * movementSpeed * moveDir;
+            }
+            float clampingSpeed = playerState == PlayerState.Sprinting ? maxSprintSpeed : maxNormalSpeed;
+            velocity.x = Mathf.Clamp(velocity.x, -clampingSpeed, clampingSpeed);
         }
         else
         {
-            SetPlayerState(PlayerState.Walking);
+            movingTime = 0;
         }
-
-        velocity = rb.velocity;
-        velocity.x = inputVel.x;
+        
+        velocity.y = rb.velocity.y;
         
         if(inputVel.magnitude == 0)
         {
@@ -83,6 +123,8 @@ public class PlayerControls : MonoBehaviour
         if (velocity.magnitude == 0)
         {
             SetPlayerState(PlayerState.Idle);
+            firstDeceleration = true;
+            movingTime = 0;
         }
     }
 
