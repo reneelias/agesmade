@@ -169,57 +169,42 @@ public class PlayerControls : MonoBehaviour
 
     void Climbing()
     {
-        /*
-        Vector2 inputVel = Vector2.zero;
-        if (Input.GetKey(KeyCode.RightArrow))
-        {
-            inputVel.x += maxNormalSpeed;
-        }
-        if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            inputVel.x -= maxNormalSpeed;
-        }
-        if (Input.GetKey(KeyCode.UpArrow))
-        {
-            inputVel.y += maxNormalSpeed;
-        }
-        if (Input.GetKey(KeyCode.DownArrow))
-        {
-            inputVel.y -= maxNormalSpeed;
-        }
-        */
         Vector2 inputVel = Vector2.zero;
         if (Input.GetKey(KeyCode.RightArrow))
         {
             inputVel.x = 1;
         }
-        if (Input.GetKey(KeyCode.LeftArrow))
+        else if (Input.GetKey(KeyCode.LeftArrow))
         {
             inputVel.x = - 1;
         }
+        else
+        {
+            inputVel.x = 0;
+        }
+
         if (Input.GetKey(KeyCode.UpArrow))
         {
             inputVel.y = 1;
         }
-        if (Input.GetKey(KeyCode.DownArrow))
+        else if (Input.GetKey(KeyCode.DownArrow))
         {
             inputVel.y = - 1;
         }
 
-        movingTime += airborneAdj * Time.deltaTime * inputVel.x;
+        movingTime = timeToFullAcceleration * inputVel.x;
         normalizedTime = movingTime / timeToFullAcceleration * Mathf.PI / 2; // So that full acceleration equals Pi/2 in the Sinusoid
-        velocity.x = maxVelocity * Mathf.Cos(normalizedTime - Mathf.PI / 2);
+        velocity.x = maxNormalSpeed * Mathf.Cos(normalizedTime - Mathf.PI / 2);
 
         velocity.y = rb.velocity.y;
         velocity.y = jumpSpeed * inputVel.y;
-
 
         animator.speed = inputVel.magnitude == 0 ? 0 : 1;
 
         if (Input.GetKey(KeyCode.Space))
         {
             velocity.y = jumpSpeed;
-            SetPlayerState(PlayerState.Walking);
+            SetPlayerState(PlayerState.Jumping);
         }
         rb.velocity = velocity;
     }
@@ -274,6 +259,7 @@ public class PlayerControls : MonoBehaviour
                 rb.gravityScale = 0;
                 break;
             case PlayerState.Jumping:
+                rb.gravityScale = 1;
                 break;
         }
     }
