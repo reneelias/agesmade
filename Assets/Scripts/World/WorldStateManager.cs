@@ -87,6 +87,7 @@ namespace World
         private void Init()
         {
             RoomTransition(currentRoom);
+            audioManager.ChangeAudio(currentWorldState);
             // ChangeWorldState(currentWorldState);
         }
         public void ChangeWorldState(EWorldState newWorldState)
@@ -118,13 +119,12 @@ namespace World
                 }
             }
 
-            if(room.name == "Room2")
-            {
-                player.transform.position = new Vector3(2, -0.252000004f, 0);
-            }
+            //if(room.name == "Room2")
+            //{
+            //    player.transform.position = new Vector3(2, -0.252000004f, 0);
+            //}
 
             // TESTING: Move player to new spawn point
-            /*
             if (portalIndex != -1)
             {
                 fromPortal = currentRoom.GetPortal(portalIndex);
@@ -136,7 +136,6 @@ namespace World
                 Debug.Log("Portaling player...");
                 player.transform.position = fromPortal.SpawnPoint.position;
             }
-            */
 
             OnRoomTransition?.Invoke(currentRoom);
         }
