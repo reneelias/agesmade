@@ -107,7 +107,7 @@ MonoBehaviour:
   jumpSpeed: 5
   frictionRatio: 0.9
   raycastOffsetX: 0.25
-  raycastOffsetY: 0.5
+  raycastOffsetY: 0.55
   raycastLength: 0.15
 --- !u!61 &2038798786868968951
 BoxCollider2D:
