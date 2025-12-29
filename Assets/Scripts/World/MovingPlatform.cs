@@ -8,22 +8,23 @@ namespace World
     public class MovingPlatform : MonoBehaviour
     {
         [SerializeField] private List<Transform> Points = new List<Transform>();
-        
-        private float timeElapsed = 0;
-        private float lerpDuration = 1;
+
+        float lerpDuration = 3; 
+        Vector3 startValue; 
+        Vector3 endValue; 
+        float timeElapsed = 0;
 
         private int pointIndex = 0;
-        private Vector3 positionToMoveTo;
-
         void Start()
         {
+            startValue = Points[0].transform.position;
+            endValue = Points[1].transform.position;
+            transform.position = startValue;
         }
 
         private void OnEnable()
         {
-            transform.position = Points[0].transform.position;
-            positionToMoveTo = Points[pointIndex+1].transform.position;
-            StartCoroutine(LerpPosition(positionToMoveTo, 5));
+            StartCoroutine(Lerp());
         }
 
         private void OnDisable()
@@ -31,24 +32,26 @@ namespace World
             StopAllCoroutines();
         }
 
-        IEnumerator LerpPosition(Vector3 targetPosition, float duration)
+        IEnumerator Lerp()
         {
-            float time = 0;
-            Vector3 startPosition = transform.position;
 
-            while (time < duration)
+            while (timeElapsed < lerpDuration)
             {
-                transform.position = Vector3.Lerp(startPosition, targetPosition, time / duration);
-                time += Time.deltaTime;
+                transform.position = Vector3.Lerp(startValue, endValue, timeElapsed / lerpDuration);
+                timeElapsed += Time.deltaTime;
+
                 yield return null;
             }
-            transform.position = targetPosition;
+            
+            timeElapsed = 0;
+            transform.position = endValue;
+            startValue = endValue;
             pointIndex = pointIndex + 1 >= Points.Count ? 0 : pointIndex + 1;
-            positionToMoveTo = Points[pointIndex].transform.position;
+            endValue = Points[pointIndex].transform.position;
 
             yield return new WaitForSeconds(1.5f);
          
-            StartCoroutine(LerpPosition(positionToMoveTo, 5));
+            StartCoroutine(Lerp());
         }
     }
 }

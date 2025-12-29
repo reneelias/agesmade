@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 1744305246418515640}
   - component: {fileID: 3095949167416842085}
   - component: {fileID: 7974193620095789122}
-  - component: {fileID: 4439001678124860296}
   - component: {fileID: 1216117762096154031}
+  - component: {fileID: 6793305291403848657}
   m_Layer: 0
   m_Name: DeathZone
   m_TagString: Untagged
@@ -28,9 +28,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1967578771037419758}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 17.58, y: 6.34, z: 0}
-  m_LocalScale: {x: 0.5514609, y: 7.595937, z: 1}
+  m_LocalScale: {x: 11.245399, y: 1.7090857, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3184576394343485232}
@@ -86,24 +86,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &4439001678124860296
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1967578771037419758}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30cc9b9ad60294162979d941aa708281, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerLayerMask:
-    serializedVersion: 2
-    m_Bits: 64
-  portalId: 0
-  nextRoom: {fileID: 0}
-  spawnPoint: {fileID: 3184576394343485232}
 --- !u!61 &1216117762096154031
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -149,6 +131,21 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &6793305291403848657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1967578771037419758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30987a417e40c4794849248bc1f4a692, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!1 &4612824722071958963
 GameObject:
   m_ObjectHideFlags: 0

@@ -48,7 +48,7 @@ namespace World
             Init();
             
             // TESTING: Remove this eventually
-            //RoomTransition(testRoom1);
+            RoomTransition(testRoom1);
 
         }
 
