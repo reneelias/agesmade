@@ -21,6 +21,7 @@ namespace World
             if ((playerLayerMask.value & (1 << col.gameObject.layer)) > 0)
             {
                 WorldStateManager.Instance.RoomTransition(nextRoom, portalId);
+                col.gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
             }
         }
     }
