@@ -36,6 +36,7 @@ namespace World
 
         public static WorldStateManager Instance => _worldStateManager;
         public Room CurrentRoom => currentRoom;
+        public PhysicsMaterial2D groundMaterial;
         
         private void Awake()
         {
@@ -51,24 +52,24 @@ namespace World
             Init();
             
             // TESTING: Remove this eventually
-            RoomTransition(testRoom1, 0);
+            // RoomTransition(testRoom1, 0);
 
         }
 
         private void Update()
         {
             // TESTING: Remove this eventually
-            if (Input.GetKeyDown(KeyCode.A))
-            {
-                if (currentRoom == testRoom1)
-                {
-                    RoomTransition(testRoom2, 0);
-                }
-                else
-                {
-                    RoomTransition(testRoom1, 0);
-                }
-            }
+            // if (Input.GetKeyDown(KeyCode.A))
+            // {
+            //     if (currentRoom == testRoom1)
+            //     {
+            //         RoomTransition(testRoom2, 0);
+            //     }
+            //     else
+            //     {
+            //         RoomTransition(testRoom1, 0);
+            //     }
+            // }
 
             if (Input.GetKeyDown(KeyCode.S))
             {
@@ -85,7 +86,8 @@ namespace World
 
         private void Init()
         {
-            ChangeWorldState(currentWorldState);
+            RoomTransition(currentRoom);
+            // ChangeWorldState(currentWorldState);
         }
         public void ChangeWorldState(EWorldState newWorldState)
         {
@@ -107,6 +109,14 @@ namespace World
             currentRoom?.ChangeWorldState(currentWorldState);
             currentRoom?.gameObject.SetActive(true);
             cameraConfiner.m_BoundingShape2D = currentRoom.CameraBounds;
+
+            foreach (BoxCollider2D collider in GameObject.FindObjectsOfType<BoxCollider2D>())
+            {
+                if (!collider.CompareTag("Player"))
+                {
+                    collider.sharedMaterial = groundMaterial;
+                }
+            }
             
             // TESTING: Move player to new spawn point
             if (portalIndex != -1)
