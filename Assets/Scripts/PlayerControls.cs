@@ -16,6 +16,8 @@ public class PlayerControls : MonoBehaviour
     [SerializeField] private float raycastOffsetX = .25f;
     [SerializeField] private float raycastOffsetY = .5f;
     [SerializeField] private float raycastLength = .15f;
+    private Animator animator;
+    private SpriteRenderer spriteRenderer;
 
     public enum PlayerState
     {
@@ -33,6 +35,8 @@ public class PlayerControls : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     void FixedUpdate()
@@ -55,6 +59,11 @@ public class PlayerControls : MonoBehaviour
     void Movement()
     {
         Vector2 inputVel = Vector2.zero;
+        if(grounded && !GroundCheck())
+        {
+            animator.SetTrigger("Airborne");
+            animator.speed = 1;
+        }
         grounded = GroundCheck();
 
         if (Input.GetKey(KeyCode.RightArrow))
@@ -65,19 +74,24 @@ public class PlayerControls : MonoBehaviour
         {
             inputVel.x -= movementSpeed;
         }
-
-        if (Input.GetKey(KeyCode.LeftShift))
+        if(inputVel.magnitude > 0)
         {
-            SetPlayerState(PlayerState.Sprinting);
-            inputVel.x *= sprintSpeed/movementSpeed;
-        }
-        else
-        {
-            SetPlayerState(PlayerState.Walking);
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                SetPlayerState(PlayerState.Sprinting);
+                inputVel.x *= sprintSpeed/movementSpeed;
+            }
+            else
+            {
+                SetPlayerState(PlayerState.Walking);
+            }
         }
 
         velocity = rb.velocity;
         velocity.x = inputVel.x;
+        if (velocity.x != 0) {
+            spriteRenderer.flipX = velocity.x < 0;
+        }
         
         if(inputVel.magnitude == 0)
         {
@@ -95,13 +109,15 @@ public class PlayerControls : MonoBehaviour
         rb.velocity = velocity;
         if (velocity.magnitude == 0)
         {
-            SetPlayerState(PlayerState.Idle);
+            if (grounded)
+            {
+                SetPlayerState(PlayerState.Idle);
+            }
         }
     }
 
     void Climbing()
     {
-        print("Climbing");
         Vector2 inputVel = Vector2.zero;
         if (Input.GetKey(KeyCode.RightArrow))
         {
@@ -119,6 +135,7 @@ public class PlayerControls : MonoBehaviour
         {
             inputVel.y -= movementSpeed;
         }
+        animator.speed = inputVel.magnitude == 0 ? 0 : 1;
 
         velocity = inputVel;
 
@@ -149,7 +166,21 @@ public class PlayerControls : MonoBehaviour
 
     void SetPlayerState(PlayerState pState)
     {
+        if(playerState == pState)
+        {
+            return;
+        }
         playerState = pState;
+        if(((int)playerState <= 2 && grounded) || (int)playerState >= 3)
+        {
+            animator.speed = 1;
+            animator.SetTrigger(playerState.ToString());
+        }
+        else if((int)playerState <= 2 && !grounded)
+        {
+            animator.SetTrigger("Airborne");
+
+        }
 
         switch (playerState)
         {
