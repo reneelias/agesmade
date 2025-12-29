@@ -878,7 +878,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1088977730}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!58 &202202910
 CircleCollider2D:
@@ -1271,7 +1271,6 @@ GameObject:
   - component: {fileID: 257689410}
   - component: {fileID: 257689413}
   - component: {fileID: 257689412}
-  - component: {fileID: 257689414}
   m_Layer: 0
   m_Name: Branch
   m_TagString: Untagged
@@ -3116,7 +3115,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1181583927626812716, guid: 4434811dccf67144580d86d69a66b65d, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.52
+      value: 0.648
       objectReference: {fileID: 0}
     - target: {fileID: 1181583927626812716, guid: 4434811dccf67144580d86d69a66b65d, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3560,7 +3559,6 @@ GameObject:
   - component: {fileID: 889514339}
   - component: {fileID: 889514342}
   - component: {fileID: 889514341}
-  - component: {fileID: 889514343}
   m_Layer: 0
   m_Name: Branch (2)_01
   m_TagString: Untagged
@@ -5616,7 +5614,7 @@ Transform:
   m_GameObject: {fileID: 1198875875}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.96, y: 0.52, z: -10}
+  m_LocalPosition: {x: -1.96, y: 0.648, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -7397,7 +7395,7 @@ Transform:
   m_GameObject: {fileID: 1772216160}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8.018914, y: 0.51999027, z: -10}
+  m_LocalPosition: {x: 8.018914, y: 0.6479903, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9393,3 +9391,4 @@ SceneRoots:
   - {fileID: 1198875878}
   - {fileID: 517886853}
   - {fileID: 764951854}
+  - {fileID: 202202909}
