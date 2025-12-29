@@ -21,7 +21,8 @@ public class PlayerControls : MonoBehaviour
     {
         Idle,
         Walking,
-        Sprinting
+        Sprinting,
+        Climbing
 
     }
     private PlayerState playerState = PlayerState.Idle;
@@ -36,7 +37,19 @@ public class PlayerControls : MonoBehaviour
 
     void FixedUpdate()
     {
-        Movement();
+        switch (playerState)
+        {
+            // case PlayerState.Idle:
+            // case PlayerState.Walking:
+            // case PlayerState.Sprinting:
+            //     break;
+            case PlayerState.Climbing:
+                Climbing();
+                break;
+            default:
+                Movement();
+                break;
+        }
     }
 
     void Movement()
@@ -86,6 +99,37 @@ public class PlayerControls : MonoBehaviour
         }
     }
 
+    void Climbing()
+    {
+        print("Climbing");
+        Vector2 inputVel = Vector2.zero;
+        if (Input.GetKey(KeyCode.RightArrow))
+        {
+            inputVel.x += movementSpeed;
+        }
+        if (Input.GetKey(KeyCode.LeftArrow))
+        {
+            inputVel.x -= movementSpeed;
+        }
+        if (Input.GetKey(KeyCode.UpArrow))
+        {
+            inputVel.y += movementSpeed;
+        }
+        if (Input.GetKey(KeyCode.DownArrow))
+        {
+            inputVel.y -= movementSpeed;
+        }
+
+        velocity = inputVel;
+
+        if (Input.GetKey(KeyCode.Space))
+        {
+            velocity.y = jumpSpeed;
+            SetPlayerState(PlayerState.Walking);
+        }
+        rb.velocity = velocity;
+    }
+
     bool GroundCheck()
     {
         for(int i = 0; i < 3; i++)
@@ -110,11 +154,36 @@ public class PlayerControls : MonoBehaviour
         switch (playerState)
         {
             case PlayerState.Idle:
+                rb.gravityScale = 1;
                 break;
             case PlayerState.Walking:
+                rb.gravityScale = 1;
                 break;
             case PlayerState.Sprinting:
+                rb.gravityScale = 1;
                 break;
+            case PlayerState.Climbing:
+                rb.gravityScale = 0;
+                break;
+        }
+    }
+
+    void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Ladder") && playerState != PlayerState.Climbing)
+        {
+            if (Input.GetKey(KeyCode.UpArrow))
+            {
+                SetPlayerState(PlayerState.Climbing);
+            }
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Ladder") && playerState == PlayerState.Climbing)
+        {
+            SetPlayerState(PlayerState.Walking);
         }
     }
 }
