@@ -977,7 +977,7 @@ PrefabInstance:
     - target: {fileID: 4596116631806716832, guid: 7ac4e48e07603234f91ac76e19c19a55, type: 3}
       propertyPath: futureSong
       value: 
-      objectReference: {fileID: 8300000, guid: 50e4e83a6aa6049959fab316b977dce4, type: 3}
+      objectReference: {fileID: 8300000, guid: 8233b6918abd02f49953b18c8ff9fe3e, type: 3}
     - target: {fileID: 4596116631806716832, guid: 7ac4e48e07603234f91ac76e19c19a55, type: 3}
       propertyPath: audioSource
       value: 
@@ -2088,8 +2088,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
-  m_Children:
-  - {fileID: 1181353744}
+  m_Children: []
   m_Father: {fileID: 1458732854}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
