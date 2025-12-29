@@ -12,7 +12,7 @@ namespace World
         [SerializeField] private GameObject PresentWorldGO;
         [SerializeField] private GameObject FutureWorldGO;
 
-        private List<Portal> portals = new List<Portal>();
+        [SerializeField] List<Portal> portals = new List<Portal>();
         public PolygonCollider2D CameraBounds => cameraBounds;
 
 
@@ -21,11 +21,11 @@ namespace World
             if (WorldStateManager.Instance.CurrentRoom != this)
                 gameObject.SetActive(false);
             
-            portals.Clear();
-            foreach (var portal in transform.GetComponentsInChildren<Portal>())
-            {
-                portals.Add(portal);
-            }
+            //portals.Clear();
+            //foreach (var portal in transform.GetComponentsInChildren<Portal>())
+            //{
+            //    portals.Add(portal);
+            //}
         }
 
         public void ChangeWorldState(EWorldState currentWorldState)

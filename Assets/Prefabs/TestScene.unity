@@ -618,6 +618,17 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.0000001, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &667860643 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1821084518681923508, guid: 2592a8a6bf56849d3b6b103bed391c86, type: 3}
+  m_PrefabInstance: {fileID: 4401360398189160245}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30cc9b9ad60294162979d941aa708281, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &735745344
 GameObject:
   m_ObjectHideFlags: 0
@@ -810,6 +821,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1181583927626812716, guid: 4434811dccf67144580d86d69a66b65d, type: 3}
   m_PrefabInstance: {fileID: 764951854}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &819935872 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1670821780385365963, guid: 9095b43c88b524a5596ff37c0bcfe3d4, type: 3}
+  m_PrefabInstance: {fileID: 9199808612537291651}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30cc9b9ad60294162979d941aa708281, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &888556596
 GameObject:
   m_ObjectHideFlags: 0
@@ -1161,6 +1183,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e0a542255ea30471f8067b3ea4dd929c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1029576210 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5220941210029060001, guid: d8c3c5847080f44a4b0cc47d593749fb, type: 3}
+  m_PrefabInstance: {fileID: 6238808813059591414}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30cc9b9ad60294162979d941aa708281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1073145221
@@ -1654,6 +1687,17 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.0000001, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &1320400329 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6418501917943537818, guid: d8c3c5847080f44a4b0cc47d593749fb, type: 3}
+  m_PrefabInstance: {fileID: 6238808813059591414}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30cc9b9ad60294162979d941aa708281, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1323363719 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 734414629184242437, guid: d8c3c5847080f44a4b0cc47d593749fb, type: 3}
@@ -1880,7 +1924,7 @@ Transform:
   m_GameObject: {fileID: 1772216160}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.140335, y: -3.71487, z: -10}
+  m_LocalPosition: {x: 7.1366568, y: -3.71487, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2144,6 +2188,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2137061902 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 843790697581956989, guid: 2592a8a6bf56849d3b6b103bed391c86, type: 3}
+  m_PrefabInstance: {fileID: 4401360398189160245}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30cc9b9ad60294162979d941aa708281, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &4401360398189160245
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2200,9 +2255,25 @@ PrefabInstance:
       propertyPath: nextRoom
       value: 
       objectReference: {fileID: 410444519}
+    - target: {fileID: 3442594662085775936, guid: 2592a8a6bf56849d3b6b103bed391c86, type: 3}
+      propertyPath: portals.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3442594662085775936, guid: 2592a8a6bf56849d3b6b103bed391c86, type: 3}
+      propertyPath: portals.Array.data[0]
+      value: 
+      objectReference: {fileID: 2137061902}
+    - target: {fileID: 3442594662085775936, guid: 2592a8a6bf56849d3b6b103bed391c86, type: 3}
+      propertyPath: portals.Array.data[1]
+      value: 
+      objectReference: {fileID: 667860643}
     - target: {fileID: 5776281985330173780, guid: 2592a8a6bf56849d3b6b103bed391c86, type: 3}
       propertyPath: m_Name
       value: Room2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5776281985330173780, guid: 2592a8a6bf56849d3b6b103bed391c86, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2305,6 +2376,18 @@ PrefabInstance:
       propertyPath: nextRoom
       value: 
       objectReference: {fileID: 1007970588}
+    - target: {fileID: 5442041925855126800, guid: d8c3c5847080f44a4b0cc47d593749fb, type: 3}
+      propertyPath: portals.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5442041925855126800, guid: d8c3c5847080f44a4b0cc47d593749fb, type: 3}
+      propertyPath: portals.Array.data[0]
+      value: 
+      objectReference: {fileID: 1029576210}
+    - target: {fileID: 5442041925855126800, guid: d8c3c5847080f44a4b0cc47d593749fb, type: 3}
+      propertyPath: portals.Array.data[1]
+      value: 
+      objectReference: {fileID: 1320400329}
     - target: {fileID: 6418501917943537818, guid: d8c3c5847080f44a4b0cc47d593749fb, type: 3}
       propertyPath: nextRoom
       value: 
@@ -2364,6 +2447,14 @@ PrefabInstance:
       propertyPath: nextRoom
       value: 
       objectReference: {fileID: 1007970588}
+    - target: {fileID: 5833939596191830017, guid: 9095b43c88b524a5596ff37c0bcfe3d4, type: 3}
+      propertyPath: portals.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5833939596191830017, guid: 9095b43c88b524a5596ff37c0bcfe3d4, type: 3}
+      propertyPath: portals.Array.data[0]
+      value: 
+      objectReference: {fileID: 819935872}
     - target: {fileID: 8088739524926045412, guid: 9095b43c88b524a5596ff37c0bcfe3d4, type: 3}
       propertyPath: m_Name
       value: Room1
