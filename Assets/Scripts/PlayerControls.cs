@@ -24,12 +24,16 @@ public class PlayerControls : MonoBehaviour
     float normalizedTime = 0;
     float maxVelocity = 0;
 
+    private Animator animator;
+    private SpriteRenderer spriteRenderer;
+
     public enum PlayerState
     {
         Idle,
         Walking,
         Sprinting,
-        Jumping
+        Jumping,
+        Climbing
 
     }
     private PlayerState playerState = PlayerState.Idle;
@@ -41,16 +45,35 @@ public class PlayerControls : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     void FixedUpdate()
     {
-        Movement();
+        switch (playerState)
+        {
+            // case PlayerState.Idle:
+            // case PlayerState.Walking:
+            // case PlayerState.Sprinting:
+            //     break;
+            case PlayerState.Climbing:
+                Climbing();
+                break;
+            default:
+                Movement();
+                break;
+        }
     }
 
     void Movement()
     {
         Vector2 inputVel = Vector2.zero;
+        if(grounded && !GroundCheck())
+        {
+            animator.SetTrigger("Airborne");
+            animator.speed = 1;
+        }
         grounded = GroundCheck();
 
         if (Input.GetKey(KeyCode.RightArrow))
@@ -131,10 +154,45 @@ public class PlayerControls : MonoBehaviour
         {
             SetPlayerState(PlayerState.Idle);
             movingTime = 0;
+            if (grounded)
+            {
+                SetPlayerState(PlayerState.Idle);
+            }
         }
 
         prevState = playerState;
         prevXInput = inputVel.x;
+    }
+
+    void Climbing()
+    {
+        Vector2 inputVel = Vector2.zero;
+        if (Input.GetKey(KeyCode.RightArrow))
+        {
+            inputVel.x += maxNormalSpeed;
+        }
+        if (Input.GetKey(KeyCode.LeftArrow))
+        {
+            inputVel.x -= maxNormalSpeed;
+        }
+        if (Input.GetKey(KeyCode.UpArrow))
+        {
+            inputVel.y += maxNormalSpeed;
+        }
+        if (Input.GetKey(KeyCode.DownArrow))
+        {
+            inputVel.y -= maxNormalSpeed;
+        }
+        animator.speed = inputVel.magnitude == 0 ? 0 : 1;
+
+        velocity = inputVel;
+
+        if (Input.GetKey(KeyCode.Space))
+        {
+            velocity.y = jumpSpeed;
+            SetPlayerState(PlayerState.Walking);
+        }
+        rb.velocity = velocity;
     }
 
     bool GroundCheck()
@@ -156,18 +214,57 @@ public class PlayerControls : MonoBehaviour
 
     void SetPlayerState(PlayerState pState)
     {
+        if(playerState == pState)
+        {
+            return;
+        }
         playerState = pState;
+        if(((int)playerState <= 2 && grounded) || (int)playerState >= 3)
+        {
+            animator.speed = 1;
+            animator.SetTrigger(playerState.ToString());
+        }
+        else if((int)playerState <= 2 && !grounded)
+        {
+            animator.SetTrigger("Airborne");
+
+        }
 
         switch (playerState)
         {
             case PlayerState.Idle:
+                rb.gravityScale = 1;
                 break;
             case PlayerState.Walking:
+                rb.gravityScale = 1;
                 break;
             case PlayerState.Sprinting:
+                rb.gravityScale = 1;
+                break;
+            case PlayerState.Climbing:
+                rb.gravityScale = 0;
                 break;
             case PlayerState.Jumping:
                 break;
+        }
+    }
+
+    void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Ladder") && playerState != PlayerState.Climbing)
+        {
+            if (Input.GetKey(KeyCode.UpArrow))
+            {
+                SetPlayerState(PlayerState.Climbing);
+            }
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Ladder") && playerState == PlayerState.Climbing)
+        {
+            SetPlayerState(PlayerState.Walking);
         }
     }
 }
