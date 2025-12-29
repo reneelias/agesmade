@@ -142,8 +142,6 @@ public class PlayerControls : MonoBehaviour
                 velocity.x = maxVelocity * Mathf.Cos(normalizedTime - Mathf.PI / 2);
             }
         }
-
-        Debug.Log(movingTime);
        
         velocity.y = rb.velocity.y;
 
@@ -171,6 +169,7 @@ public class PlayerControls : MonoBehaviour
 
     void Climbing()
     {
+        /*
         Vector2 inputVel = Vector2.zero;
         if (Input.GetKey(KeyCode.RightArrow))
         {
@@ -188,9 +187,34 @@ public class PlayerControls : MonoBehaviour
         {
             inputVel.y -= maxNormalSpeed;
         }
-        animator.speed = inputVel.magnitude == 0 ? 0 : 1;
+        */
+        Vector2 inputVel = Vector2.zero;
+        if (Input.GetKey(KeyCode.RightArrow))
+        {
+            inputVel.x = 1;
+        }
+        if (Input.GetKey(KeyCode.LeftArrow))
+        {
+            inputVel.x = - 1;
+        }
+        if (Input.GetKey(KeyCode.UpArrow))
+        {
+            inputVel.y = 1;
+        }
+        if (Input.GetKey(KeyCode.DownArrow))
+        {
+            inputVel.y = - 1;
+        }
 
-        velocity = inputVel;
+        movingTime += airborneAdj * Time.deltaTime * inputVel.x;
+        normalizedTime = movingTime / timeToFullAcceleration * Mathf.PI / 2; // So that full acceleration equals Pi/2 in the Sinusoid
+        velocity.x = maxVelocity * Mathf.Cos(normalizedTime - Mathf.PI / 2);
+
+        velocity.y = rb.velocity.y;
+        velocity.y = jumpSpeed * inputVel.y;
+
+
+        animator.speed = inputVel.magnitude == 0 ? 0 : 1;
 
         if (Input.GetKey(KeyCode.Space))
         {

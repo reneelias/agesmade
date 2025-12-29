@@ -14,7 +14,7 @@ namespace World
 
     public class WorldStateManager : MonoBehaviour
     {
-        [SerializeField] private EWorldState currentWorldState = EWorldState.PAST;
+        [SerializeField] public EWorldState currentWorldState = EWorldState.PAST;
         
         [Header("References")]
         [SerializeField] private CinemachineConfiner2D cameraConfiner;
@@ -27,6 +27,8 @@ namespace World
 
         private static WorldStateManager _worldStateManager;
         [SerializeField] private Room currentRoom;
+
+        [SerializeField] private AudioManager audioManager;
 
         public Action<EWorldState> OnWorldStateChange;
         public Action<Room> OnRoomTransition;
@@ -71,6 +73,7 @@ namespace World
             if (Input.GetKeyDown(KeyCode.S))
             {
                 ChangeWorldState(currentWorldState == EWorldState.FUTURE ? 0 : currentWorldState + 1);
+
             }
         }
 
@@ -90,6 +93,8 @@ namespace World
             
             currentRoom?.ChangeWorldState(newWorldState);
             OnWorldStateChange?.Invoke(currentWorldState);
+
+            audioManager.ChangeAudio(newWorldState);
         }
 
         public void RoomTransition(Room room, int portalIndex = -1)
