@@ -20,7 +20,7 @@ namespace World
         {
             if ((playerLayerMask.value & (1 << col.gameObject.layer)) > 0)
             {
-                WorldStateManager.Instance.RoomTransition(nextRoom, portalId);
+                WorldStateManager.Instance.RoomTransition(nextRoom, 0);
                 col.gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
             }
         }
