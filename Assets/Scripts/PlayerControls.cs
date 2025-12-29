@@ -89,6 +89,11 @@ public class PlayerControls : MonoBehaviour
             inputVel.x = 0;
         }
 
+        if(Mathf.Abs(inputVel.x) > 0 && velocity.x != 0)
+        {
+            spriteRenderer.flipX = velocity.x < 0;
+        }
+
         // Set Sprinting vs. Walking State and maxVelocity
         if(grounded)
         {
