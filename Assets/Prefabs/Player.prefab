@@ -99,11 +99,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fb00df2a739b6e4ca50aff9695f400b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementSpeed: 10
-  maxMovementSpeed: 5
+  maxNormalSpeed: 4
+  maxSprintSpeed: 8
   jumpSpeed: 5
-  frictionRatio: 0.9
-  raycastOffsetX: 0.25
+  horizToVertVel: 0.2
+  raycastOffsetX: 0.05
   raycastOffsetY: 0.5
   raycastLength: 0.15
 --- !u!61 &2038798786868968951

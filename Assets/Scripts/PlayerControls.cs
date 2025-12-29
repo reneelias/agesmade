@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,27 +7,33 @@ public class PlayerControls : MonoBehaviour
 {
     private Rigidbody2D rb;
     [Header("Physics")]
-    [SerializeField] private float movementSpeed = 10f;
-    [SerializeField] private float maxNormalSpeed = 5f;
-    [SerializeField] private float sprintSpeed = 15;
-    [SerializeField] private float maxSprintSpeed = 8f;
-    [SerializeField] private float jumpSpeed = 10f;
-    [SerializeField] private float frictionRatio = .9f;
-    private bool firstDeceleration = true;
-    private float movingTime = 0;
+    [SerializeField] private float maxNormalSpeed;
+    [SerializeField] private float maxSprintSpeed;
+    [SerializeField] private float jumpSpeed;
+    [SerializeField] private float horizToVertVel;
+    [SerializeField] private float airborneAdj;
+
     [Header("Ground Check")]
-    [SerializeField] private float raycastOffsetX = .25f;
-    [SerializeField] private float raycastOffsetY = .5f;
-    [SerializeField] private float raycastLength = .15f;
+    [SerializeField] private float raycastOffsetX;
+    [SerializeField] private float raycastOffsetY;
+    [SerializeField] private float raycastLength;
+
+    float timeToFullAcceleration = 0.25f;
+    float movingTime = 0;
+    float prevXInput = 0;
+    float normalizedTime = 0;
+    float maxVelocity = 0;
 
     public enum PlayerState
     {
         Idle,
         Walking,
-        Sprinting
+        Sprinting,
+        Jumping
 
     }
     private PlayerState playerState = PlayerState.Idle;
+    PlayerState prevState = PlayerState.Idle;
     private Vector2 velocity;
     private bool grounded = false;
 
@@ -48,84 +55,86 @@ public class PlayerControls : MonoBehaviour
 
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            inputVel.x += movementSpeed;
+            inputVel.x = 1;
         }
-        if (Input.GetKey(KeyCode.LeftArrow))
+        else if (Input.GetKey(KeyCode.LeftArrow))
         {
-            inputVel.x -= movementSpeed;
-        }
-
-        if(inputVel.x != 0)
-        {
-            if (Input.GetKey(KeyCode.LeftShift))
-            {
-                SetPlayerState(PlayerState.Sprinting);
-                inputVel.x *= sprintSpeed/movementSpeed;
-            }
-            else
-            {
-                SetPlayerState(PlayerState.Walking);
-            }
-
-            velocity.x = inputVel.x;
-        }
-        if(inputVel.magnitude > 0)
-        {
-            if (Input.GetKey(KeyCode.LeftShift))
-            {
-                SetPlayerState(PlayerState.Sprinting);
-            }
-            else
-            {
-                SetPlayerState(PlayerState.Walking);
-            }
-            float moveDir = inputVel.x < 0 ? -1 : 1;
-            movingTime += Time.deltaTime;
-            if(velocity.x == 0  || inputVel.x / velocity.x > 0)
-            {
-                velocity.x = (Mathf.Log(movingTime/10) + Mathf.Epsilon) * movementSpeed * moveDir;
-                firstDeceleration = true;
-            }
-            else
-            {
-                if (firstDeceleration)
-                {
-                    movingTime = 0;
-                    firstDeceleration = false;
-                }
-                
-                velocity.x += Mathf.Exp(movingTime) * movementSpeed * moveDir;
-            }
-            float clampingSpeed = playerState == PlayerState.Sprinting ? maxSprintSpeed : maxNormalSpeed;
-            velocity.x = Mathf.Clamp(velocity.x, -clampingSpeed, clampingSpeed);
+            inputVel.x = -1;
         }
         else
         {
-            movingTime = 0;
-        }
-        
-        velocity.y = rb.velocity.y;
-        
-        if(inputVel.magnitude == 0)
-        {
-            velocity.x *= frictionRatio;
+            inputVel.x = 0;
         }
 
-        if (grounded)
+        // Set Sprinting vs. Walking State and maxVelocity
+        if(grounded)
         {
-            if (Input.GetKey(KeyCode.Space))
+            // reset movingTime if just landed or crashed into a wall
+            if((prevState == PlayerState.Jumping && inputVel.x != prevXInput) || rb.velocity.x == 0)
             {
-                velocity.y = jumpSpeed;
+                movingTime = 0;
+                velocity.x = 0;
+            }
+
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                SetPlayerState(PlayerState.Sprinting);
+            }
+            else
+            {
+                SetPlayerState(PlayerState.Walking);
+            }
+
+            maxVelocity = playerState == PlayerState.Sprinting ? maxSprintSpeed : maxNormalSpeed;
+            if (Mathf.Abs(inputVel.x) > 0) // Acclerate
+            {
+                movingTime += Time.deltaTime * inputVel.x;
+                movingTime = Mathf.Clamp(movingTime, -timeToFullAcceleration, timeToFullAcceleration);
+            }
+            else if (inputVel.x == 0 && movingTime > 0) // Decelerate
+            {
+                movingTime -= Time.deltaTime;
+                movingTime = Mathf.Clamp(movingTime, 0, timeToFullAcceleration);
+            }
+            else if (inputVel.x == 0 && movingTime < 0) // Decelerate
+            {
+                movingTime += Time.deltaTime;
+                movingTime = Mathf.Clamp(movingTime, -timeToFullAcceleration, 0);
+            }
+
+            normalizedTime = movingTime / timeToFullAcceleration * Mathf.PI / 2; // So that full acceleration equals Pi/2 in the Sinusoid
+            velocity.x = maxVelocity * Mathf.Cos(normalizedTime - Mathf.PI / 2);
+        }
+        else // airborne adjustment
+        {
+            if (Mathf.Abs(inputVel.x) > 0) // Acclerate
+            {
+                movingTime += airborneAdj * Time.deltaTime * inputVel.x;
+                normalizedTime = movingTime / timeToFullAcceleration * Mathf.PI / 2; // So that full acceleration equals Pi/2 in the Sinusoid
+                velocity.x = maxVelocity * Mathf.Cos(normalizedTime - Mathf.PI / 2);
             }
         }
 
+        Debug.Log(movingTime);
+       
+        velocity.y = rb.velocity.y;
+
+        if (grounded && Input.GetKey(KeyCode.Space))
+        {
+            velocity.y = jumpSpeed + Mathf.Abs(velocity.x) * horizToVertVel;
+            SetPlayerState(PlayerState.Jumping);
+        }
+
         rb.velocity = velocity;
+
         if (velocity.magnitude == 0)
         {
             SetPlayerState(PlayerState.Idle);
-            firstDeceleration = true;
             movingTime = 0;
         }
+
+        prevState = playerState;
+        prevXInput = inputVel.x;
     }
 
     bool GroundCheck()
@@ -156,6 +165,8 @@ public class PlayerControls : MonoBehaviour
             case PlayerState.Walking:
                 break;
             case PlayerState.Sprinting:
+                break;
+            case PlayerState.Jumping:
                 break;
         }
     }
