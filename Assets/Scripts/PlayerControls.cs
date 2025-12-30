@@ -23,6 +23,7 @@ public class PlayerControls : MonoBehaviour
     float prevXInput = 0;
     float normalizedTime = 0;
     float maxVelocity = 0;
+    float prevXVelocity = 0;
 
     private Animator animator;
     private SpriteRenderer spriteRenderer;
@@ -53,10 +54,6 @@ public class PlayerControls : MonoBehaviour
     {
         switch (playerState)
         {
-            // case PlayerState.Idle:
-            // case PlayerState.Walking:
-            // case PlayerState.Sprinting:
-            //     break;
             case PlayerState.Climbing:
                 Climbing();
                 break;
@@ -135,20 +132,21 @@ public class PlayerControls : MonoBehaviour
         }
         else // airborne adjustment
         {
-            if (Mathf.Abs(inputVel.x) > 0) // Acclerate
+            if (Mathf.Abs(inputVel.x) > 0)
             {
                 movingTime += airborneAdj * Time.deltaTime * inputVel.x;
+                movingTime = Mathf.Clamp(movingTime, -timeToFullAcceleration, timeToFullAcceleration);
+
                 normalizedTime = movingTime / timeToFullAcceleration * Mathf.PI / 2; // So that full acceleration equals Pi/2 in the Sinusoid
                 velocity.x = maxVelocity * Mathf.Cos(normalizedTime - Mathf.PI / 2);
             }
         }
-       
+
         velocity.y = rb.velocity.y;
 
         if (grounded && Input.GetKey(KeyCode.Space))
         {
-            velocity.y = jumpSpeed + Mathf.Abs(velocity.x) * horizToVertVel;
-            SetPlayerState(PlayerState.Jumping);
+            Jump();
         }
 
         rb.velocity = velocity;
@@ -165,6 +163,14 @@ public class PlayerControls : MonoBehaviour
 
         prevState = playerState;
         prevXInput = inputVel.x;
+
+        prevXVelocity = velocity.x;
+    }
+
+    void Jump()
+    {
+        velocity.y = jumpSpeed + Mathf.Abs(velocity.x) * horizToVertVel;
+        SetPlayerState(PlayerState.Jumping);
     }
 
     void Climbing()
@@ -196,15 +202,13 @@ public class PlayerControls : MonoBehaviour
         normalizedTime = movingTime / timeToFullAcceleration * Mathf.PI / 2; // So that full acceleration equals Pi/2 in the Sinusoid
         velocity.x = maxNormalSpeed * Mathf.Cos(normalizedTime - Mathf.PI / 2);
 
-        velocity.y = rb.velocity.y;
         velocity.y = jumpSpeed * inputVel.y;
 
         animator.speed = inputVel.magnitude == 0 ? 0 : 1;
 
         if (Input.GetKey(KeyCode.Space))
         {
-            velocity.y = jumpSpeed;
-            SetPlayerState(PlayerState.Jumping);
+            Jump();
         }
         rb.velocity = velocity;
     }
@@ -246,19 +250,10 @@ public class PlayerControls : MonoBehaviour
 
         switch (playerState)
         {
-            case PlayerState.Idle:
-                rb.gravityScale = 1;
-                break;
-            case PlayerState.Walking:
-                rb.gravityScale = 1;
-                break;
-            case PlayerState.Sprinting:
-                rb.gravityScale = 1;
-                break;
             case PlayerState.Climbing:
                 rb.gravityScale = 0;
                 break;
-            case PlayerState.Jumping:
+            default:
                 rb.gravityScale = 1;
                 break;
         }
