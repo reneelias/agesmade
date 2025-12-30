@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerControls : MonoBehaviour
 {
@@ -55,15 +56,16 @@ public class PlayerControls : MonoBehaviour
         switch (playerState)
         {
             case PlayerState.Climbing:
-                Climbing();
+                Climb();
                 break;
             default:
-                Movement();
+                Move();
                 break;
         }
     }
 
-    void Movement()
+#region PlayerInputs
+    public void Move(InputAction.CallbackContext context)
     {
         Vector2 inputVel = Vector2.zero;
         if(grounded && !GroundCheck())
@@ -173,7 +175,7 @@ public class PlayerControls : MonoBehaviour
         SetPlayerState(PlayerState.Jumping);
     }
 
-    void Climbing()
+    void Climb()
     {
         Vector2 inputVel = Vector2.zero;
         if (Input.GetKey(KeyCode.RightArrow))
@@ -212,6 +214,8 @@ public class PlayerControls : MonoBehaviour
         }
         rb.velocity = velocity;
     }
+
+    #endregion
 
     bool GroundCheck()
     {
