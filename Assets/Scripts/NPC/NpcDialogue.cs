@@ -11,11 +11,9 @@ namespace NPC
 
         void OnTriggerEnter2D(Collider2D col)
         {
-            Debug.Log("Trigger Enter");
             // If player
             if ((playerLayerMask.value & (1 << col.gameObject.layer)) > 0)
             {
-                Debug.Log("ShowDialogue");
                 ShowDialogue();
             }
         }

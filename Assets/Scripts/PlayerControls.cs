@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,7 +10,6 @@ public class PlayerControls : MonoBehaviour
     private Rigidbody2D rb;
     [Header("Physics")]
     [SerializeField] private float maxNormalSpeed;
-    [SerializeField] private float maxSprintSpeed;
     [SerializeField] private float jumpSpeed;
     [SerializeField] private float horizToVertVel;
     [SerializeField] private float airborneAdj;
@@ -19,15 +19,18 @@ public class PlayerControls : MonoBehaviour
     [SerializeField] private float raycastOffsetY;
     [SerializeField] private float raycastLength;
 
+    private float maxSprintSpeed { get { return 2 * maxNormalSpeed; } }
+
     float timeToFullAcceleration = 0.25f;
     float movingTime = 0;
     float prevXInput = 0;
     float normalizedTime = 0;
-    float maxVelocity = 0;
+    float maxVelocity;
     float prevXVelocity = 0;
 
     private Animator animator;
     private SpriteRenderer spriteRenderer;
+
 
     public enum PlayerState
     {
@@ -40,79 +43,125 @@ public class PlayerControls : MonoBehaviour
     }
     private PlayerState playerState = PlayerState.Idle;
     PlayerState prevState = PlayerState.Idle;
+
+    private Vector2 inputVel = Vector2.zero;
     private Vector2 velocity;
     private bool grounded = false;
 
     // Start is called before the first frame update
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+
+        maxVelocity = maxNormalSpeed;
     }
 
     void FixedUpdate()
     {
+        grounded = GroundCheck();
+
         switch (playerState)
         {
             case PlayerState.Climbing:
-                Climb();
+                rb.gravityScale = 0;
                 break;
             default:
-                Move();
+                rb.gravityScale = 1;
                 break;
         }
+
+        CheckGroundedPlayerState();
+
+        switch (playerState)
+        {
+            case PlayerState.Climbing:
+                Climb(inputVel);
+                break;
+            default:
+                HorizMove(inputVel);
+                break;
+        }
+
+        Debug.Log(playerState.ToString());
+        prevState = playerState;
     }
 
-#region PlayerInputs
-    public void Move(InputAction.CallbackContext context)
-    {
-        Vector2 inputVel = Vector2.zero;
-        if(grounded && !GroundCheck())
-        {
-            animator.SetTrigger("Airborne");
-            animator.speed = 1;
-        }
-        grounded = GroundCheck();
+    #region PlayerInputs
 
-        if (Input.GetKey(KeyCode.RightArrow))
+    public void OnMove(InputAction.CallbackContext context)
+    {
+        inputVel = context.ReadValue<Vector2>();
+    }
+
+    void CheckGroundedPlayerState()
+    {
+        if (!grounded || playerState == PlayerState.Climbing)
         {
-            inputVel.x = 1;
+            return;
         }
-        else if (Input.GetKey(KeyCode.LeftArrow))
+
+        if (rb.velocity.magnitude == 0)
         {
-            inputVel.x = -1;
+            SetPlayerState(PlayerState.Idle);
+            movingTime = 0;
+        }
+        else if (Mathf.Abs(rb.velocity.x) > maxNormalSpeed)
+        {
+            SetPlayerState(PlayerState.Sprinting);
         }
         else
         {
-            inputVel.x = 0;
+            SetPlayerState(PlayerState.Walking);
+        }
+    }
+
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        if(grounded || playerState == PlayerState.Climbing)
+        {
+            SetPlayerState(PlayerState.Jumping);
+            Jump();
+        }
+    }
+
+    public void OnSprint(InputAction.CallbackContext context)
+    {
+        if (!grounded)
+        {
+            return;
         }
 
-        if(Mathf.Abs(inputVel.x) > 0 && velocity.x != 0)
+        if(context.canceled)
+        {
+            maxVelocity = maxNormalSpeed;
+        }
+        else
+        {
+            maxVelocity = maxSprintSpeed;
+        }
+    }
+
+    void HorizMove(Vector2 inputVel)
+    {
+        // This shouldn't be here. REmove to animator script
+        if (Mathf.Abs(inputVel.x) > 0 && velocity.x != 0)
         {
             spriteRenderer.flipX = velocity.x < 0;
         }
 
         // Set Sprinting vs. Walking State and maxVelocity
-        if(grounded)
+        if (grounded)
         {
             // reset movingTime if just landed or crashed into a wall
-            if((prevState == PlayerState.Jumping && inputVel.x != prevXInput) || rb.velocity.x == 0)
+            if (rb.velocity.x == 0)
             {
                 movingTime = 0;
                 velocity.x = 0;
             }
 
-            if (Input.GetKey(KeyCode.LeftShift))
-            {
-                SetPlayerState(PlayerState.Sprinting);
-            }
-            else
-            {
-                SetPlayerState(PlayerState.Walking);
-            }
-
-            maxVelocity = playerState == PlayerState.Sprinting ? maxSprintSpeed : maxNormalSpeed;
             if (Mathf.Abs(inputVel.x) > 0) // Acclerate
             {
                 movingTime += Time.deltaTime * inputVel.x;
@@ -144,62 +193,20 @@ public class PlayerControls : MonoBehaviour
             }
         }
 
-        velocity.y = rb.velocity.y;
-
-        if (grounded && Input.GetKey(KeyCode.Space))
-        {
-            Jump();
-        }
-
         rb.velocity = velocity;
 
-        if (velocity.magnitude == 0)
-        {
-            SetPlayerState(PlayerState.Idle);
-            movingTime = 0;
-            if (grounded)
-            {
-                SetPlayerState(PlayerState.Idle);
-            }
-        }
-
-        prevState = playerState;
         prevXInput = inputVel.x;
-
         prevXVelocity = velocity.x;
     }
 
     void Jump()
     {
-        velocity.y = jumpSpeed + Mathf.Abs(velocity.x) * horizToVertVel;
-        SetPlayerState(PlayerState.Jumping);
+        Vector2 vertForce = new Vector2(0, jumpSpeed + Mathf.Abs(velocity.x) * horizToVertVel);
+        rb.AddForce(vertForce);
     }
 
-    void Climb()
+    void Climb(Vector2 inputVel)
     {
-        Vector2 inputVel = Vector2.zero;
-        if (Input.GetKey(KeyCode.RightArrow))
-        {
-            inputVel.x = 1;
-        }
-        else if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            inputVel.x = - 1;
-        }
-        else
-        {
-            inputVel.x = 0;
-        }
-
-        if (Input.GetKey(KeyCode.UpArrow))
-        {
-            inputVel.y = 1;
-        }
-        else if (Input.GetKey(KeyCode.DownArrow))
-        {
-            inputVel.y = - 1;
-        }
-
         movingTime = timeToFullAcceleration * inputVel.x;
         normalizedTime = movingTime / timeToFullAcceleration * Mathf.PI / 2; // So that full acceleration equals Pi/2 in the Sinusoid
         velocity.x = maxNormalSpeed * Mathf.Cos(normalizedTime - Mathf.PI / 2);
@@ -208,10 +215,6 @@ public class PlayerControls : MonoBehaviour
 
         animator.speed = inputVel.magnitude == 0 ? 0 : 1;
 
-        if (Input.GetKey(KeyCode.Space))
-        {
-            Jump();
-        }
         rb.velocity = velocity;
     }
 
@@ -240,34 +243,16 @@ public class PlayerControls : MonoBehaviour
         {
             return;
         }
+
         playerState = pState;
-        if(((int)playerState <= 2 && grounded) || (int)playerState >= 3)
-        {
-            animator.speed = 1;
-            animator.SetTrigger(playerState.ToString());
-        }
-        else if((int)playerState <= 2 && !grounded)
-        {
-            animator.SetTrigger("Airborne");
-
-        }
-
-        switch (playerState)
-        {
-            case PlayerState.Climbing:
-                rb.gravityScale = 0;
-                break;
-            default:
-                rb.gravityScale = 1;
-                break;
-        }
+        animator.SetTrigger(playerState.ToString());
     }
 
     void OnTriggerStay2D(Collider2D collision)
     {
         if (collision.CompareTag("Ladder") && playerState != PlayerState.Climbing)
         {
-            if (Input.GetKey(KeyCode.UpArrow))
+            if (inputVel.y > 0)
             {
                 SetPlayerState(PlayerState.Climbing);
             }
@@ -278,7 +263,10 @@ public class PlayerControls : MonoBehaviour
     {
         if (collision.CompareTag("Ladder") && playerState == PlayerState.Climbing)
         {
-            SetPlayerState(PlayerState.Walking);
+            if (grounded && inputVel.y < 0)
+            {
+                SetPlayerState(PlayerState.Walking);
+            }
         }
     }
 }

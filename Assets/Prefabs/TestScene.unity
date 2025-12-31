@@ -865,12 +865,64 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5336477192762074491, guid: 4434811dccf67144580d86d69a66b65d, type: 3}
+      propertyPath: jumpSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5336477192762074491, guid: 4434811dccf67144580d86d69a66b65d, type: 3}
       propertyPath: airborneAdj
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5336477192762074491, guid: 4434811dccf67144580d86d69a66b65d, type: 3}
+      propertyPath: maxNormalSpeed
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5336477192762074491, guid: 4434811dccf67144580d86d69a66b65d, type: 3}
+      propertyPath: inputActions.m_Id
+      value: 2ca900b6-4fe0-4586-96aa-1d697ec6f12a
+      objectReference: {fileID: 0}
+    - target: {fileID: 5336477192762074491, guid: 4434811dccf67144580d86d69a66b65d, type: 3}
+      propertyPath: inputActions.m_Name
+      value: Input Actions
+      objectReference: {fileID: 0}
+    - target: {fileID: 5336477192762074491, guid: 4434811dccf67144580d86d69a66b65d, type: 3}
+      propertyPath: inputActions.m_Actions.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5336477192762074491, guid: 4434811dccf67144580d86d69a66b65d, type: 3}
+      propertyPath: inputActions.m_Bindings.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5336477192762074491, guid: 4434811dccf67144580d86d69a66b65d, type: 3}
+      propertyPath: inputActions.m_Actions.Array.data[0].m_Id
+      value: 4fdb8e6f-d823-4463-a9e4-dbca46f05ddd
+      objectReference: {fileID: 0}
+    - target: {fileID: 5336477192762074491, guid: 4434811dccf67144580d86d69a66b65d, type: 3}
+      propertyPath: inputActions.m_Bindings.Array.data[0].m_Id
+      value: d566dff6-8a21-49de-9326-a94eb5fe2f63
+      objectReference: {fileID: 0}
+    - target: {fileID: 5336477192762074491, guid: 4434811dccf67144580d86d69a66b65d, type: 3}
+      propertyPath: inputActions.m_Actions.Array.data[0].m_Name
+      value: New action
+      objectReference: {fileID: 0}
+    - target: {fileID: 5336477192762074491, guid: 4434811dccf67144580d86d69a66b65d, type: 3}
+      propertyPath: inputActions.m_Actions.Array.data[0].m_Type
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5336477192762074491, guid: 4434811dccf67144580d86d69a66b65d, type: 3}
+      propertyPath: inputActions.m_Bindings.Array.data[0].m_Action
+      value: New action
+      objectReference: {fileID: 0}
+    - target: {fileID: 5336477192762074491, guid: 4434811dccf67144580d86d69a66b65d, type: 3}
+      propertyPath: inputActions.m_Actions.Array.data[0].m_ExpectedControlType
+      value: Button
       objectReference: {fileID: 0}
     - target: {fileID: 7226065621197493658, guid: 4434811dccf67144580d86d69a66b65d, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 7974895377115402436, guid: 4434811dccf67144580d86d69a66b65d, type: 3}
+      propertyPath: m_GravityScale
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1660,6 +1712,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 7226065621197493658, guid: 4434811dccf67144580d86d69a66b65d, type: 3}
   m_PrefabInstance: {fileID: 764951854}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1739166330 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5336477192762074491, guid: 4434811dccf67144580d86d69a66b65d, type: 3}
+  m_PrefabInstance: {fileID: 764951854}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1739166326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fb00df2a739b6e4ca50aff9695f400b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1739166332
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1673,7 +1736,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Actions: {fileID: -944628639613478452, guid: e9367929e1a8f4f47858465c11634922, type: 3}
-  m_NotificationBehavior: 0
+  m_NotificationBehavior: 2
   m_UIInputModule: {fileID: 0}
   m_DeviceLostEvent:
     m_PersistentCalls:
@@ -1684,7 +1747,59 @@ MonoBehaviour:
   m_ControlsChangedEvent:
     m_PersistentCalls:
       m_Calls: []
-  m_ActionEvents: []
+  m_ActionEvents:
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1739166330}
+        m_TargetAssemblyTypeName: PlayerControls, Assembly-CSharp
+        m_MethodName: OnMove
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 303ef7f8-2e91-4b3d-8953-9da4feebbab6
+    m_ActionName: Player/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d,/Keyboard/upArrow,/Keyboard/downArrow,/Keyboard/leftArrow,/Keyboard/rightArrow]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1739166330}
+        m_TargetAssemblyTypeName: PlayerControls, Assembly-CSharp
+        m_MethodName: OnJump
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: c26460a1-e689-4744-9ab5-64b8f7d0a758
+    m_ActionName: Player/Jump[/Keyboard/space]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: a4c2f651-d649-45d4-9e93-7b1a3e48dbe1
+    m_ActionName: Player/Time Travel[/Keyboard/s]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1739166330}
+        m_TargetAssemblyTypeName: PlayerControls, Assembly-CSharp
+        m_MethodName: OnSprint
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 67e1941e-6572-451f-a369-83924f918534
+    m_ActionName: Player/Sprint[/Keyboard/shift]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -1856,7 +1971,7 @@ Transform:
   m_GameObject: {fileID: 1772216160}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.2657986, y: -3.71487, z: -10}
+  m_LocalPosition: {x: 7.2549934, y: -3.71487, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
