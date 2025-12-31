@@ -13,6 +13,7 @@ public class PlayerControls : MonoBehaviour
     [SerializeField] private float jumpSpeed;
     [SerializeField] private float horizToVertVel;
     [SerializeField] private float airborneAdj;
+    [SerializeField] private float timeToFullAcceleration;
 
     [Header("Ground Check")]
     [SerializeField] private float raycastOffsetX;
@@ -21,12 +22,10 @@ public class PlayerControls : MonoBehaviour
 
     private float maxSprintSpeed { get { return 2 * maxNormalSpeed; } }
 
-    float timeToFullAcceleration = 0.25f;
+    
     float movingTime = 0;
-    float prevXInput = 0;
     float normalizedTime = 0;
     float maxVelocity;
-    float prevXVelocity = 0;
 
     private Animator animator;
     private SpriteRenderer spriteRenderer;
@@ -86,7 +85,6 @@ public class PlayerControls : MonoBehaviour
                 break;
         }
 
-        Debug.Log(playerState.ToString());
         prevState = playerState;
     }
 
@@ -130,12 +128,7 @@ public class PlayerControls : MonoBehaviour
 
     public void OnSprint(InputAction.CallbackContext context)
     {
-        if (!grounded)
-        {
-            return;
-        }
-
-        if(context.canceled)
+        if(context.canceled || !grounded)
         {
             maxVelocity = maxNormalSpeed;
         }
@@ -154,15 +147,9 @@ public class PlayerControls : MonoBehaviour
         }
 
         // Set Sprinting vs. Walking State and maxVelocity
+        // TODO: Convert from movingTime to adding to velocity
         if (grounded)
         {
-            // reset movingTime if just landed or crashed into a wall
-            if (rb.velocity.x == 0)
-            {
-                movingTime = 0;
-                velocity.x = 0;
-            }
-
             if (Mathf.Abs(inputVel.x) > 0) // Acclerate
             {
                 movingTime += Time.deltaTime * inputVel.x;
@@ -184,7 +171,7 @@ public class PlayerControls : MonoBehaviour
         }
         else // airborne adjustment
         {
-            if (Mathf.Abs(inputVel.x) > 0)
+            if (Math.Abs(rb.velocity.x) > 0) // if we haven't collided with an object in the air
             {
                 movingTime += airborneAdj * Time.deltaTime * inputVel.x;
                 movingTime = Mathf.Clamp(movingTime, -timeToFullAcceleration, timeToFullAcceleration);
@@ -192,17 +179,18 @@ public class PlayerControls : MonoBehaviour
                 normalizedTime = movingTime / timeToFullAcceleration * Mathf.PI / 2; // So that full acceleration equals Pi/2 in the Sinusoid
                 velocity.x = maxVelocity * Mathf.Cos(normalizedTime - Mathf.PI / 2);
             }
+            else
+            {
+                Debug.Log("Airborne collision!");
+                movingTime = 0;
+            }
         }
 
         rb.velocity = velocity;
-
-        prevXInput = inputVel.x;
-        prevXVelocity = velocity.x;
     }
 
     void Jump()
     {   
-
         velocity.y = jumpSpeed + Mathf.Abs(velocity.x) * horizToVertVel;
         rb.velocity = velocity;
     }
