@@ -1,10 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// Get Controller Input and Set Movement and Collision for Player
+/// </summary>
 public class PlayerControls : MonoBehaviour
 {
     private Rigidbody2D rb;
@@ -41,7 +43,6 @@ public class PlayerControls : MonoBehaviour
 
     }
     private PlayerState playerState = PlayerState.Idle;
-    PlayerState prevState = PlayerState.Idle;
 
     private Vector2 inputVel = Vector2.zero;
     private Vector2 velocity;
@@ -61,6 +62,8 @@ public class PlayerControls : MonoBehaviour
     void FixedUpdate()
     {
         grounded = GroundCheck();
+        animator.SetBool("Grounded", grounded);
+
         velocity = rb.velocity;
 
         switch (playerState)
@@ -85,7 +88,7 @@ public class PlayerControls : MonoBehaviour
                 break;
         }
 
-        prevState = playerState;
+        SetRBVelocity();
     }
 
     #region PlayerInputs
@@ -93,6 +96,13 @@ public class PlayerControls : MonoBehaviour
     public void OnMove(InputAction.CallbackContext context)
     {
         inputVel = context.ReadValue<Vector2>();
+        animator.SetFloat("InputY", inputVel.y);
+    }
+
+    void SetRBVelocity()
+    {
+        rb.velocity = velocity;
+        animator.SetFloat("AbsVelocityX", Mathf.Abs(Mathf.Round(rb.velocity.x)));
     }
 
     void CheckGroundedPlayerState()
@@ -102,7 +112,7 @@ public class PlayerControls : MonoBehaviour
             return;
         }
 
-        if (rb.velocity.magnitude == 0)
+        if (Mathf.Abs(inputVel.x) == 0)
         {
             SetPlayerState(PlayerState.Idle);
             movingTime = 0;
@@ -122,6 +132,7 @@ public class PlayerControls : MonoBehaviour
         if(grounded || playerState == PlayerState.Climbing)
         {
             SetPlayerState(PlayerState.Jumping);
+            animator.SetTrigger("OnJumpPressed");
             Jump();
         }
     }
@@ -181,18 +192,15 @@ public class PlayerControls : MonoBehaviour
             }
             else
             {
-                Debug.Log("Airborne collision!");
                 movingTime = 0;
             }
         }
-
-        rb.velocity = velocity;
     }
 
     void Jump()
     {   
         velocity.y = jumpSpeed + Mathf.Abs(velocity.x) * horizToVertVel;
-        rb.velocity = velocity;
+        SetRBVelocity();
     }
 
     void Climb(Vector2 inputVel)
@@ -204,8 +212,6 @@ public class PlayerControls : MonoBehaviour
         velocity.y = jumpSpeed * inputVel.y;
 
         animator.speed = inputVel.magnitude == 0 ? 0 : 1;
-
-        rb.velocity = velocity;
     }
 
     #endregion
@@ -235,11 +241,15 @@ public class PlayerControls : MonoBehaviour
         }
 
         playerState = pState;
-        animator.SetTrigger(playerState.ToString());
     }
 
     void OnTriggerStay2D(Collider2D collision)
     {
+        if (collision.CompareTag("Ladder"))
+        {
+            animator.SetBool("AtLadder", true);
+        }
+
         if (collision.CompareTag("Ladder") && playerState != PlayerState.Climbing)
         {
             if (inputVel.y > 0)
@@ -251,11 +261,16 @@ public class PlayerControls : MonoBehaviour
 
     void OnTriggerExit2D(Collider2D collision)
     {
+        if (collision.CompareTag("Ladder"))
+        {
+            animator.SetBool("AtLadder", false);
+        }
+
         if (collision.CompareTag("Ladder") && playerState == PlayerState.Climbing)
         {
             if (grounded && inputVel.y < 0)
             {
-                SetPlayerState(PlayerState.Walking);
+                SetPlayerState(PlayerState.Idle);
             }
             else
             {
