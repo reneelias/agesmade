@@ -269,6 +269,10 @@ public class PlayerControls : MonoBehaviour
             {
                 SetPlayerState(PlayerState.Walking);
             }
+            else
+            {
+                SetPlayerState(PlayerState.Jumping);
+            }
         }
     }
 }
