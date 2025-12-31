@@ -3077,6 +3077,10 @@ PrefabInstance:
       propertyPath: m_LocalScale.y
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5823363956907933283, guid: 9095b43c88b524a5596ff37c0bcfe3d4, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5833939596191830017, guid: 9095b43c88b524a5596ff37c0bcfe3d4, type: 3}
       propertyPath: portals.Array.size
       value: 1
@@ -3103,7 +3107,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8088739524926045412, guid: 9095b43c88b524a5596ff37c0bcfe3d4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8186599357405190062, guid: 9095b43c88b524a5596ff37c0bcfe3d4, type: 3}
       propertyPath: m_Size.y
