@@ -201,8 +201,8 @@ public class PlayerControls : MonoBehaviour
 
     void Jump()
     {
-        Vector2 vertForce = new Vector2(0, jumpSpeed + Mathf.Abs(velocity.x) * horizToVertVel);
-        rb.AddForce(vertForce);
+        velocity.y = jumpSpeed + Mathf.Abs(velocity.x) * horizToVertVel;
+        rb.velocity = velocity;
     }
 
     void Climb(Vector2 inputVel)
