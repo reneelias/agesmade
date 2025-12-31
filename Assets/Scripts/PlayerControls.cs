@@ -62,6 +62,7 @@ public class PlayerControls : MonoBehaviour
     void FixedUpdate()
     {
         grounded = GroundCheck();
+        velocity = rb.velocity;
 
         switch (playerState)
         {
@@ -200,7 +201,8 @@ public class PlayerControls : MonoBehaviour
     }
 
     void Jump()
-    {
+    {   
+
         velocity.y = jumpSpeed + Mathf.Abs(velocity.x) * horizToVertVel;
         rb.velocity = velocity;
     }
