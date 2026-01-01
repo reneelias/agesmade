@@ -30,6 +30,10 @@ namespace World
 
         [SerializeField] private AudioManager audioManager;
 
+        // TODO: Reconcile HWorldStateChange with ONWorldStateChange
+        public delegate void WorldStateChangeHandler( EWorldState state);
+        public static event WorldStateChangeHandler HWorldStateChange;
+
         public Action<EWorldState> OnWorldStateChange;
         public Action<Room> OnRoomTransition;
         private Portal fromPortal;
@@ -96,6 +100,8 @@ namespace World
             
             currentRoom?.ChangeWorldState(newWorldState);
             OnWorldStateChange?.Invoke(currentWorldState);
+
+            HWorldStateChange?.Invoke(currentWorldState);
 
             audioManager.ChangeAudio(newWorldState);
         }

@@ -18,9 +18,21 @@ namespace World
 
         private void Start()
         {
-            if (WorldStateManager.Instance.CurrentRoom != this)
-                gameObject.SetActive(false);
-            
+            //if (WorldStateManager.Instance.CurrentRoom != this)
+            //    gameObject.SetActive(false);
+
+            //Transform[] transforms = PastWorldGO.GetComponentsInChildren<Transform>(true);
+
+            //foreach (Transform transform in transforms)
+            //{
+            //    if (transform.gameObject.CompareTag("Ground") && transform.gameObject.TryGetComponent<SpriteRenderer>(out SpriteRenderer spriteRenderer))
+            //    {
+
+            //        Debug.Log(spriteRenderer.gameObject.name + " color is now " + spriteRenderer.color);
+            //    }
+            //}
+
+            // TODO: Patch portals!
             //portals.Clear();
             //foreach (var portal in transform.GetComponentsInChildren<Portal>())
             //{
