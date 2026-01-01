@@ -111,19 +111,6 @@ namespace World
             currentRoom?.gameObject.SetActive(true);
             cameraConfiner.m_BoundingShape2D = currentRoom.CameraBounds;
 
-            foreach (BoxCollider2D collider in GameObject.FindObjectsOfType<BoxCollider2D>())
-            {
-                if (!collider.CompareTag("Player"))
-                {
-                    collider.sharedMaterial = groundMaterial;
-                }
-            }
-
-            //if(room.name == "Room2")
-            //{
-            //    player.transform.position = new Vector3(2, -0.252000004f, 0);
-            //}
-
             // TESTING: Move player to new spawn point
             if (portalIndex != -1)
             {
