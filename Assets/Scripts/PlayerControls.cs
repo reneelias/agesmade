@@ -9,46 +9,46 @@ using UnityEngine.InputSystem;
 /// </summary>
 public class PlayerControls : MonoBehaviour
 {
+
+    #region Properties
     private Rigidbody2D rb;
     [Header("Physics")]
     [SerializeField] private float maxNormalSpeed;
+    [SerializeField] private float maxSprintSpeed;
     [SerializeField] private float jumpSpeed;
     [SerializeField] private float horizToVertVel;
     [SerializeField] private float airborneAdj;
-    [SerializeField] private float timeToFullAcceleration;
+    [SerializeField] private float timeToFullAccel;
+    [SerializeField] private float accelerationCurvePower;
 
     [Header("Ground Check")]
     [SerializeField] private float raycastOffsetX;
     [SerializeField] private float raycastOffsetY;
     [SerializeField] private float raycastLength;
 
-    private float maxSprintSpeed { get { return 2 * maxNormalSpeed; } }
-
-    
-    float movingTime = 0;
-    float normalizedTime = 0;
-    float maxVelocity;
-
     private Animator animator;
     private SpriteRenderer spriteRenderer;
 
 
-    public enum PlayerState
+    public enum ControlState
     {
-        Idle,
-        Walking,
-        Sprinting,
-        Jumping,
+        Default,
         Climbing
-
     }
-    private PlayerState playerState = PlayerState.Idle;
+    private ControlState controlState = ControlState.Default;
 
     private Vector2 inputVel = Vector2.zero;
-    private Vector2 velocity;
-    private bool grounded = false;
 
-    // Start is called before the first frame update
+    float maxVelocity;
+
+    private Vector2 velocity = Vector2.zero;
+    public Vector2 Velocity { get => velocity; }
+
+    private bool grounded = false;
+    private bool atLadder = false;
+    #endregion
+
+    #region MonoBehaviour
 
     void Start()
     {
@@ -66,32 +66,27 @@ public class PlayerControls : MonoBehaviour
 
         velocity = rb.velocity;
 
-        switch (playerState)
+        switch (controlState)
         {
-            case PlayerState.Climbing:
-                rb.gravityScale = 0;
-                break;
-            default:
-                rb.gravityScale = 1;
-                break;
-        }
-
-        CheckGroundedPlayerState();
-
-        switch (playerState)
-        {
-            case PlayerState.Climbing:
+            case ControlState.Climbing:
                 Climb(inputVel);
                 break;
             default:
                 HorizMove(inputVel);
+                // Set FlipX for playerSprite
+                if (Mathf.Abs(inputVel.x) > 0 && velocity.x != 0)
+                {
+                    spriteRenderer.flipX = velocity.x < 0;
+                }
                 break;
         }
 
         SetRBVelocity();
     }
 
-    #region PlayerInputs
+    #endregion
+
+    #region OnInputActions
 
     public void OnMove(InputAction.CallbackContext context)
     {
@@ -99,40 +94,11 @@ public class PlayerControls : MonoBehaviour
         animator.SetFloat("InputY", inputVel.y);
     }
 
-    void SetRBVelocity()
-    {
-        rb.velocity = velocity;
-        animator.SetFloat("AbsVelocityX", Mathf.Abs(Mathf.Round(rb.velocity.x)));
-    }
-
-    void CheckGroundedPlayerState()
-    {
-        if (!grounded || playerState == PlayerState.Climbing)
-        {
-            return;
-        }
-
-        if (Mathf.Abs(inputVel.x) == 0)
-        {
-            SetPlayerState(PlayerState.Idle);
-            movingTime = 0;
-        }
-        else if (Mathf.Abs(rb.velocity.x) > maxNormalSpeed)
-        {
-            SetPlayerState(PlayerState.Sprinting);
-        }
-        else
-        {
-            SetPlayerState(PlayerState.Walking);
-        }
-    }
-
     public void OnJump(InputAction.CallbackContext context)
     {
-        if(grounded || playerState == PlayerState.Climbing)
+        if(grounded || (atLadder && controlState == ControlState.Climbing))
         {
-            SetPlayerState(PlayerState.Jumping);
-            animator.SetTrigger("OnJumpPressed");
+            SetControlState(ControlState.Default);
             Jump();
         }
     }
@@ -142,6 +108,7 @@ public class PlayerControls : MonoBehaviour
         if(context.canceled || !grounded)
         {
             maxVelocity = maxNormalSpeed;
+
         }
         else
         {
@@ -149,52 +116,63 @@ public class PlayerControls : MonoBehaviour
         }
     }
 
-    void HorizMove(Vector2 inputVel)
+    #endregion
+
+    #region PlayerControls
+    void HorizMove(Vector2 inputVector)
     {
-        // This shouldn't be here. REmove to animator script
-        if (Mathf.Abs(inputVel.x) > 0 && velocity.x != 0)
+        // 1 if grounded, *airborneAdj if !grounded
+        float airControlFactor = grounded ? 1 : airborneAdj;
+
+        if (inputVector.x/velocity.x > 0 || (Mathf.Abs(inputVector.x) > 0 && velocity.x == 0)) // Acclerate on Input that matches current speed vector
         {
-            spriteRenderer.flipX = velocity.x < 0;
+            float inputAcceleration = Mathf.Sign(inputVector.x)  * maxVelocity * airControlFactor;
+            velocity.x += GetAccelVelocity(inputAcceleration, Time.deltaTime);
+
+            velocity.x = Mathf.Clamp(velocity.x, -maxVelocity, maxVelocity);
         }
-
-        // Set Sprinting vs. Walking State and maxVelocity
-        // TODO: Convert from movingTime to adding to velocity
-        if (grounded)
+        else if (inputVector.x / velocity.x < 0 || inputVector.x == 0) // Decelerate on input that opposes current speed vector 
         {
-            if (Mathf.Abs(inputVel.x) > 0) // Acclerate
-            {
-                movingTime += Time.deltaTime * inputVel.x;
-                movingTime = Mathf.Clamp(movingTime, -timeToFullAcceleration, timeToFullAcceleration);
-            }
-            else if (inputVel.x == 0 && movingTime > 0) // Decelerate
-            {
-                movingTime -= Time.deltaTime;
-                movingTime = Mathf.Clamp(movingTime, 0, timeToFullAcceleration);
-            }
-            else if (inputVel.x == 0 && movingTime < 0) // Decelerate
-            {
-                movingTime += Time.deltaTime;
-                movingTime = Mathf.Clamp(movingTime, -timeToFullAcceleration, 0);
-            }
+            float inputAcceleration = Mathf.Sign(velocity.x) * maxVelocity * airControlFactor;
+            velocity.x -= GetAccelVelocity(inputAcceleration, Time.deltaTime);
 
-            normalizedTime = movingTime / timeToFullAcceleration * Mathf.PI / 2; // So that full acceleration equals Pi/2 in the Sinusoid
-            velocity.x = maxVelocity * Mathf.Cos(normalizedTime - Mathf.PI / 2);
-        }
-        else // airborne adjustment
-        {
-            if (Math.Abs(rb.velocity.x) > 0) // if we haven't collided with an object in the air
+            if (velocity.x > 0)
             {
-                movingTime += airborneAdj * Time.deltaTime * inputVel.x;
-                movingTime = Mathf.Clamp(movingTime, -timeToFullAcceleration, timeToFullAcceleration);
-
-                normalizedTime = movingTime / timeToFullAcceleration * Mathf.PI / 2; // So that full acceleration equals Pi/2 in the Sinusoid
-                velocity.x = maxVelocity * Mathf.Cos(normalizedTime - Mathf.PI / 2);
+                velocity.x = Mathf.Clamp(velocity.x, 0, maxVelocity);
             }
             else
             {
-                movingTime = 0;
+                velocity.x = Mathf.Clamp(velocity.x, -maxVelocity, 0);
+            }
+
+            if (Mathf.Abs(velocity.x) < maxNormalSpeed/4) // clamp at low values
+            {
+                velocity.x = 0;
             }
         }
+    }
+
+    /// <summary>
+    /// Use Acceleration and Time to get Final Velocity.
+    /// </summary>
+    /// <param name="accel"></param>
+    /// <param name="time"></param>
+    /// <returns></returns>
+    float GetAccelVelocity(float accel, float time)
+    {
+        float accelRate = Mathf.Pow(timeToFullAccel, -accelerationCurvePower);
+
+        float outputVelocity = accel * accelRate * Mathf.Pow(time, accelerationCurvePower);
+        return outputVelocity;
+    }
+
+    float GetDecelVelocity(float accel, float time)
+    {
+        float accelRate = Mathf.Pow(timeToFullAccel, -accelerationCurvePower);
+        float quickDecel = maxVelocity == maxSprintSpeed ? 12f : 8f;
+
+        float outputVelocity = accel * quickDecel * accelRate * (Mathf.Pow(time, -accelerationCurvePower));
+        return outputVelocity;
     }
 
     void Jump()
@@ -203,18 +181,19 @@ public class PlayerControls : MonoBehaviour
         SetRBVelocity();
     }
 
+    void SetRBVelocity()
+    {
+        rb.velocity = velocity;
+        animator.SetFloat("AbsVelocityX", Mathf.Abs(Mathf.Round(rb.velocity.x)));
+    }
+
     void Climb(Vector2 inputVel)
     {
-        movingTime = timeToFullAcceleration * inputVel.x;
-        normalizedTime = movingTime / timeToFullAcceleration * Mathf.PI / 2; // So that full acceleration equals Pi/2 in the Sinusoid
-        velocity.x = maxNormalSpeed * Mathf.Cos(normalizedTime - Mathf.PI / 2);
-
-        velocity.y = jumpSpeed * inputVel.y;
+        velocity.x = maxNormalSpeed * inputVel.x * 50 * Time.deltaTime;
+        velocity.y = jumpSpeed * inputVel.y * 50 * Time.deltaTime;
 
         animator.speed = inputVel.magnitude == 0 ? 0 : 1;
     }
-
-    #endregion
 
     bool GroundCheck()
     {
@@ -233,28 +212,44 @@ public class PlayerControls : MonoBehaviour
         return false;
     }
 
-    void SetPlayerState(PlayerState pState)
+    void SetControlState(ControlState pState)
     {
-        if(playerState == pState)
+        if(controlState == pState)
         {
             return;
         }
 
-        playerState = pState;
+        controlState = pState;
+
+        switch(controlState)
+        {
+            case ControlState.Climbing:
+            {
+                rb.gravityScale = 0;
+                break;
+            }
+            default:
+            {
+                rb.gravityScale = 1;
+                break;
+            }
+        }
     }
+
+    #endregion
+
+    #region OnTrigger
 
     void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.CompareTag("Ladder"))
+        if (collision.CompareTag("Ladder") && controlState != ControlState.Climbing)
         {
-            animator.SetBool("AtLadder", true);
-        }
+            atLadder = true;
+            animator.SetBool("AtLadder", atLadder);
 
-        if (collision.CompareTag("Ladder") && playerState != PlayerState.Climbing)
-        {
             if (inputVel.y > 0)
             {
-                SetPlayerState(PlayerState.Climbing);
+                SetControlState(ControlState.Climbing);
             }
         }
     }
@@ -263,19 +258,12 @@ public class PlayerControls : MonoBehaviour
     {
         if (collision.CompareTag("Ladder"))
         {
-            animator.SetBool("AtLadder", false);
-        }
+            atLadder = false;
+            animator.SetBool("AtLadder", atLadder);
 
-        if (collision.CompareTag("Ladder") && playerState == PlayerState.Climbing)
-        {
-            if (grounded && inputVel.y < 0)
-            {
-                SetPlayerState(PlayerState.Idle);
-            }
-            else
-            {
-                SetPlayerState(PlayerState.Jumping);
-            }
+            SetControlState(ControlState.Default);
         }
     }
+
+    #endregion
 }

@@ -102,10 +102,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxNormalSpeed: 4
+  maxSprintSpeed: 8
   jumpSpeed: 5
   horizToVertVel: 0.2
   airborneAdj: 0.5
-  timeToFullAcceleration: 0.25
+  timeToFullAccel: 0.25
+  accelerationCurvePower: 1.5
   raycastOffsetX: 0.05
   raycastOffsetY: 0.5
   raycastLength: 0.15
