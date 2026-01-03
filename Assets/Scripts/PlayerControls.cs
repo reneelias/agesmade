@@ -64,7 +64,7 @@ public class PlayerControls : MonoBehaviour
         grounded = GroundCheck();
         animator.SetBool("Grounded", grounded);
 
-        velocity = rb.velocity;
+        velocity = rb.linearVelocity;
 
         switch (controlState)
         {
@@ -183,8 +183,8 @@ public class PlayerControls : MonoBehaviour
 
     void SetRBVelocity()
     {
-        rb.velocity = velocity;
-        animator.SetFloat("AbsVelocityX", Mathf.Abs(Mathf.Round(rb.velocity.x)));
+        rb.linearVelocity = velocity;
+        animator.SetFloat("AbsVelocityX", Mathf.Abs(Mathf.Round(rb.linearVelocity.x)));
     }
 
     void Climb(Vector2 inputVel)
